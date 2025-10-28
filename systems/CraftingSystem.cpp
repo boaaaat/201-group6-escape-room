@@ -1,5 +1,13 @@
 #include "CraftingSystem.h"
 #include <iostream>
+#include <algorithm>
+
+std::string toLower(const std::string &input) {
+    std::string result = input;
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return result;
+}
 
 void CraftingSystem::addRecipe(const CraftRecipe& r) {
     // Don't add duplicates with the same resultName
@@ -12,10 +20,17 @@ void CraftingSystem::addRecipe(const CraftRecipe& r) {
 }
 
 bool CraftingSystem::craft(Inventory& inv, const std::string& resultName) {
-    // find recipe by resultName
+    auto toLower = [](const std::string& s) {
+        std::string out = s;
+        std::transform(out.begin(), out.end(), out.begin(),
+                       [](unsigned char c) { return std::tolower(c); });
+        return out;
+    };
+
     const CraftRecipe* chosen = nullptr;
     for (const auto& r : recipes) {
-        if (r.resultName == resultName) {
+        // std::cout << toLower(resultName);
+        if (toLower(r.resultName) == resultName) {
             chosen = &r;
             break;
         }
