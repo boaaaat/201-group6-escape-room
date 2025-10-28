@@ -20,6 +20,6 @@ bool ScramblePuzzle::play()
         }
     }
 
-    std::cout << "[BASKET] \"Impressive. Balance returns to laundry.\"\n";
+    std::cout << "[BASKET] \"Impressive...\"\n";
     return true;
 }
