@@ -82,6 +82,17 @@ Game::Game() {
 }
 
 void Game::run() {
+    std::cout << "=== Commands: ===" << std::endl;
+    std::cout << " move <direction>" << std::endl;
+    std::cout << " observe" << std::endl;
+    std::cout << " interact <object>" << std::endl;
+    std::cout << " craft <object name in quotes>" << std::endl;
+    std::cout << " uncraft" << std::endl;
+    std::cout << " recipes" << std::endl;
+    std::cout << " hint" << std::endl;
+    std::cout << " info <object>" << std::endl;
+    std::cout << " inv (see inventory)" << std::endl;
+    std::cout << " solve (solve the puzzle)" << std::endl << std::endl;
     std::cout << "[You awaken in the Interdimensional Lost & Found...]\n";
     std::cout << "CLERK: \"Four rooms. Four proofs. Reclaim yourself.\"\n";
 
@@ -136,9 +147,23 @@ void Game::run() {
         } else if (cmd == "solve") {
             tryRoomFinalPuzzle();
 
-        } else {
+        } 
+        else if (cmd == "help") {
+            std::cout << "=== Commands: ===" << std::endl;
+            std::cout << " move <direction>" << std::endl;
+            std::cout << " observe" << std::endl;
+            std::cout << " interact <object>" << std::endl;
+            std::cout << " craft <object name in quotes>" << std::endl;
+            std::cout << " uncraft" << std::endl;
+            std::cout << " recipes" << std::endl;
+            std::cout << " hint" << std::endl;
+            std::cout << " info <object>" << std::endl;
+            std::cout << " inv (see inventory)" << std::endl;
+            std::cout << " solve (solve the puzzle)" << std::endl;
+        }
+        else {
             std::cout << "Unknown command. Try:\n";
-            std::cout << "  move / observe / interact / craft / uncraft / recipes / hint / info / inv / solve / quit\n";
+            std::cout << "  move / observe / interact / craft / uncraft / recipes / hint / info / inv / solve / help / quit\n";
         }
     }
 }

@@ -15,7 +15,7 @@ void Area::observe() const {
                 std::cout << "You notice:\n";
                 anyObjects = true;
             }
-            std::cout << " - " << objName << ": " << data.desc << "\n";
+            std::cout << " - " << objName << "\n";
         }
     }
     if (!anyObjects) {
