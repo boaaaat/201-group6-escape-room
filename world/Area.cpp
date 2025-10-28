@@ -3,7 +3,7 @@
 
 void Area::observe() const {
     std::cout << "=== " << displayName << " ===\n";
-    std::cout << description << "\n";
+    std::cout << description << "\n\n";
 
     // list objects
     bool anyObjects = false;
@@ -21,6 +21,7 @@ void Area::observe() const {
     if (!anyObjects) {
         std::cout << "Nothing else here looks interactive.\n";
     }
+    std::cout << std::endl;
 
     // list doors
     if (!doors.empty()) {

@@ -83,16 +83,16 @@ Game::Game() {
 
 void Game::run() {
     std::cout << "=== Commands: ===" << std::endl;
-    std::cout << " move <direction>" << std::endl;
-    std::cout << " observe" << std::endl;
-    std::cout << " interact <object>" << std::endl;
-    std::cout << " craft <object name in quotes>" << std::endl;
-    std::cout << " uncraft" << std::endl;
-    std::cout << " recipes" << std::endl;
-    std::cout << " hint" << std::endl;
-    std::cout << " info <object>" << std::endl;
+    std::cout << " move <direction> (m)" << std::endl;
+    std::cout << " observe (obs)" << std::endl;
+    std::cout << " interact <object> (int)" << std::endl;
+    std::cout << " craft <object name in quotes> (c)" << std::endl;
+    std::cout << " uncraft (u)" << std::endl;
+    std::cout << " recipes (r)" << std::endl;
+    std::cout << " hint (h)" << std::endl;
+    std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
-    std::cout << " solve (solve the puzzle)" << std::endl << std::endl;
+    std::cout << " solve (solve the puzzle) (s)" << std::endl << std::endl;
     std::cout << "[You awaken in the Interdimensional Lost & Found...]\n";
     std::cout << "CLERK: \"Four rooms. Four proofs. Reclaim yourself.\"\n";
 
@@ -117,49 +117,49 @@ void Game::run() {
             std::cout << "You fade out of this dimension...\n";
             break;
 
-        } else if (cmd == "move") {
+        } else if (cmd == "move" || cmd == "m") {
             cmdMove(args);
 
-        } else if (cmd == "observe") {
+        } else if (cmd == "observe" || cmd == "obs") {
             cmdObserve();
 
-        } else if (cmd == "interact") {
+        } else if (cmd == "interact" || cmd == "int") {
             cmdInteract(args);
 
-        } else if (cmd == "craft") {
+        } else if (cmd == "craft" || cmd == "c") {
             cmdCraft(args);
 
-        } else if (cmd == "uncraft") {
+        } else if (cmd == "uncraft" || cmd == "u") {
             cmdUncraft();
 
-        } else if (cmd == "recipes") {
+        } else if (cmd == "recipes" || cmd == "r") {
             cmdRecipes();
 
-        } else if (cmd == "hint") {
+        } else if (cmd == "hint" || cmd == "h") {
             cmdHint();
 
-        } else if (cmd == "info") {
+        } else if (cmd == "info" || cmd == "i") {
             cmdInfo(args);
 
         } else if (cmd == "inv" || cmd == "inventory") {
             cmdInventory();
 
-        } else if (cmd == "solve") {
+        } else if (cmd == "solve" || cmd == "s") {
             tryRoomFinalPuzzle();
 
         } 
         else if (cmd == "help") {
             std::cout << "=== Commands: ===" << std::endl;
-            std::cout << " move <direction>" << std::endl;
-            std::cout << " observe" << std::endl;
-            std::cout << " interact <object>" << std::endl;
-            std::cout << " craft <object name in quotes>" << std::endl;
-            std::cout << " uncraft" << std::endl;
-            std::cout << " recipes" << std::endl;
-            std::cout << " hint" << std::endl;
-            std::cout << " info <object>" << std::endl;
+            std::cout << " move <direction> (m)" << std::endl;
+            std::cout << " observe (obs)" << std::endl;
+            std::cout << " interact <object> (int)" << std::endl;
+            std::cout << " craft <object name in quotes> (c)" << std::endl;
+            std::cout << " uncraft (u)" << std::endl;
+            std::cout << " recipes (r)" << std::endl;
+            std::cout << " hint (h)" << std::endl;
+            std::cout << " info <object> (i)" << std::endl;
             std::cout << " inv (see inventory)" << std::endl;
-            std::cout << " solve (solve the puzzle)" << std::endl;
+            std::cout << " solve (solve the puzzle) (s)" << std::endl << std::endl;
         }
         else {
             std::cout << "Unknown command. Try:\n";
@@ -219,6 +219,7 @@ void Game::cmdMove(const std::vector<std::string>& args) {
     }
 
     // auto observe new area
+    std::cout << "\033[2J\033[1;1H";
     cmdObserve();
 }
 

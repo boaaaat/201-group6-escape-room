@@ -108,7 +108,7 @@ void RoomLostSocks::buildAreas() {
     fuzzyDesk.addObject(
         "desk",
         "You rummage through the fuzzy drawers.\n"
-        "You find: Sock of Truth (R). It says \"Did Lefty ask about me?\"",
+        "You find: Sock of Truth (R). Maybe there is a left one...",
         Item(
             "Sock of Truth (R)",
             "A right sock with a interesting color palette.",
@@ -131,7 +131,7 @@ void RoomLostSocks::buildAreas() {
     fuzzyDesk.addDoor(
         "south",
         Door(
-            "A corner where a dryer hums like a miniature wormhole",
+            "A corner where a loud vacuum sound is coming from.",
             "lost_socks",
             "dryer_portal",
             false,
@@ -144,13 +144,13 @@ void RoomLostSocks::buildAreas() {
         "dryer_portal",
         "Dryer Portal Corner",
         "A dryer shaped like a tiny black hole. A glowing laundry basket floats in front of\n"
-        "a shimmering EXIT PORTAL. The basket stares at you without eyes."
+        "a shimmering EXIT PORTAL. The basket stares at you menancingly."
     );
-
+    
     dryerPortal.addObject(
         "basket",
         "The basket booms:\n"
-        "\"ONLY MATCHED LOVE MAY PASS. SPELL YOUR WORTH.\"\n"
+        "\"ONLY MATCHES MAY PASS. SPELL YOUR WORTH.\"\n"
         "Yeah, it's dramatic.",
         Item("", "", false, ""),
         /*singleUse=*/false
