@@ -6,7 +6,6 @@
 
 class CraftingSystem {
 public:
-    std::string toLower(const std::string &input);
     void addRecipe(const CraftRecipe& r);
     bool craft(Inventory& inv, const std::string& resultName);
     bool uncraft(Inventory& inv);

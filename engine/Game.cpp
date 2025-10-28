@@ -4,6 +4,7 @@
 #include "../world/Room.h"
 #include <iostream>
 #include <algorithm>
+#include <Helpers.h>
 
 class RoomPantryStub : public Room 
 {
@@ -86,7 +87,7 @@ void Game::run() {
     std::cout << " move <direction> (m)" << std::endl;
     std::cout << " observe (obs)" << std::endl;
     std::cout << " interact <object> (int)" << std::endl;
-    std::cout << " craft <object name in quotes> (c)" << std::endl;
+    std::cout << " craft <object name> (c)" << std::endl;
     std::cout << " uncraft (u)" << std::endl;
     std::cout << " recipes (r)" << std::endl;
     std::cout << " hint (h)" << std::endl;
@@ -153,7 +154,7 @@ void Game::run() {
             std::cout << " move <direction> (m)" << std::endl;
             std::cout << " observe (obs)" << std::endl;
             std::cout << " interact <object> (int)" << std::endl;
-            std::cout << " craft <object name in quotes> (c)" << std::endl;
+            std::cout << " craft <object name> (c)" << std::endl;
             std::cout << " uncraft (u)" << std::endl;
             std::cout << " recipes (r)" << std::endl;
             std::cout << " hint (h)" << std::endl;
@@ -267,7 +268,7 @@ void Game::cmdCraft(const std::vector<std::string>& args) {
         itemName += args[i];
     }
 
-    crafting.craft(player.getInventory(), itemName);
+    crafting.craft(player.getInventory(), toLower(itemName));
 }
 
 void Game::cmdUncraft() {

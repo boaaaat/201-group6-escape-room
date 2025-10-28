@@ -34,7 +34,7 @@ bool RoomLostSocks::attemptFinalPuzzle(Inventory& inv,
                                        CraftingSystem& crafting) {
     // require the crafted "Matched Pair"
     if (!inv.hasItem("Matched Pair")) {
-        std::cout << "BASKET: \"You dare challenge me WITHOUT a "Matched Pair"?!\"\n";
+        std::cout << "BASKET: \"You dare challenge me WITHOUT a \"Matched Pair\"?!\n";
         std::cout << "BASKET: \"Do not return until you have proven yourself.\"\n";
         return false;
     }

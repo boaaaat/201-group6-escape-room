@@ -17,6 +17,7 @@
                 "main.cpp",
                 "engine/Game.cpp",
                 "engine/CommandParser.cpp",
+                "engine/Helpers.cpp",
 
                 "world/WorldMap.cpp",
                 "world/Room.cpp",
@@ -29,6 +30,11 @@
                 "puzzles/ScramblePuzzle.cpp",
 
                 "content/RoomLostSocks.cpp",
+
+                "-static",
+                "-static-libgcc",
+                "-static-libstdc++",
+                "-static-libgcc",
 
                 "-o",
                 "game.exe"
