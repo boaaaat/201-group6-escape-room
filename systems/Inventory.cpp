@@ -1,5 +1,6 @@
 #include "Inventory.h"
 #include <iostream>
+#include <Helpers.h>
 
 // addItem:
 //  - push item into vector
@@ -56,7 +57,7 @@ bool Inventory::describeItem(const std::string& itemName) const
 {
     for (const auto& i : items) 
     {
-        if (i.getName() == itemName) 
+        if (toLower(i.getName()) == toLower(itemName)) 
         {
             std::cout << "=== " << i.getName() << " ===\n";
             std::cout << i.getDescription() << "\n";
