@@ -19,7 +19,7 @@ public:
         Area entry(
             "pantry_entry",
             "Crumb Floor",
-            "You are standing in sticky crumbs. Something smells... historical."
+            "You are standing in sticky crumbs."
         );
         // Add at least one door back to socks room for now:
         entry.addDoor(
