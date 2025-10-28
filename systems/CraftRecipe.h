@@ -12,3 +12,12 @@ struct CraftRecipe {
     std::string resultDesc;
     std::string resultTip;
 };
+// Recipe for Matched Pair (combining L + R)
+inline CraftRecipe matchedPair() {
+    return CraftRecipe{
+        {"Sock of Truth (L)", "Sock of Truth (R)"},
+        "Matched Pair",
+        "A perfectly matched pair of Socks of Truth. Can activate the Scramble Puzzle.",
+        "Prove the socks match by completing the puzzle activation."
+    };
+}
