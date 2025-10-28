@@ -19,8 +19,8 @@ RoomLostSocks::RoomLostSocks(CraftingSystem& craftRef)
     CraftRecipe pairRecipe;
     pairRecipe.ingredients = { "Sock of Truth (L)", "Sock of Truth (R)" };
     pairRecipe.resultName  = "Matched Pair";
-    pairRecipe.resultDesc  = "Both Socks of Truth finally reunited. They hum in harmony.";
-    pairRecipe.resultTip   = "The laundry basket only respects properly matched love.";
+    pairRecipe.resultDesc  = "A pair of matching socks.";
+    pairRecipe.resultTip   = "The laundry basket only respects properly matched socks.";
     craftingRef.addRecipe(pairRecipe);
 
     buildAreas();
@@ -34,8 +34,8 @@ bool RoomLostSocks::attemptFinalPuzzle(Inventory& inv,
                                        CraftingSystem& crafting) {
     // require the crafted "Matched Pair"
     if (!inv.hasItem("Matched Pair")) {
-        std::cout << "BASKET: \"You dare challenge me WITHOUT a matched pair?\"\n";
-        std::cout << "BASKET: \"Return when your socks know true love.\"\n";
+        std::cout << "BASKET: \"You dare challenge me WITHOUT a matched pair?!\"\n";
+        std::cout << "BASKET: \"Do not return until you have proven yourself.\"\n";
         return false;
     }
 
@@ -46,8 +46,8 @@ bool RoomLostSocks::attemptFinalPuzzle(Inventory& inv,
         return false;
     }
 
-    std::cout << "The glowing laundry basket vibrates with approval.\n";
-    std::cout << "\"Proceed... and may your pairs be ever complete.\"\n";
+    std::cout << "The laundry basket shimmers with light brightly.\n";
+    std::cout << "\"You can now proceed.\"\n";
 
     solved = true;
     this->solved = true;
@@ -73,17 +73,17 @@ void RoomLostSocks::buildAreas() {
     Area sockMountain(
         "sock_mountain",
         "Mount Sockmore",
-        "A hill of tangled socks from every known universe. Some of them hum breakup songs."
+        "A hill of tangled socks with a variety of different colors."
     );
     sockMountain.addObject(
         "sockpile",
-        "You dig into the sock pile. The air smells like static and heartbreak.\n"
-        "A lonely sock wriggles into your hand, whispering: \"I miss Righty...\"",
+        "You dig into the sockpile.\n"
+        "As you dig into the sockpile, a sock wriggles into your hand, whispering: \"I miss Righty...\"",
         Item(
             "Sock of Truth (L)",
-            "A left sock buzzing with cosmic static. It vibrates with desperate loyalty.",
+            "A left sock with a very interesting color palette...",
             true,
-            "Probably needs its partner. It won't feel 'complete' alone."
+            "Is it just me or did this sock just whisper me something about missing a Righty?"
         ),
         /*singleUse=*/true
     );
@@ -102,7 +102,7 @@ void RoomLostSocks::buildAreas() {
     Area fuzzyDesk(
         "fuzzy_desk",
         "The Fuzzy Desk",
-        "An ancient office desk covered in lint and snack crumbs. A sticky note reads:\n"
+        "An ancient office desk covered in dust and snack crumbs. A sticky note reads:\n"
         "\"KCSO -> SOCK. Remember this.\""
     );
     fuzzyDesk.addObject(
@@ -111,7 +111,7 @@ void RoomLostSocks::buildAreas() {
         "You find: Sock of Truth (R). It says \"Did Lefty ask about me?\"",
         Item(
             "Sock of Truth (R)",
-            "A right sock pulsing with insecure energy. It just wants to be loved.",
+            "A right sock with a interesting color palette.",
             true,
             "If reunited with Lefty, something powerful might happen."
         ),
