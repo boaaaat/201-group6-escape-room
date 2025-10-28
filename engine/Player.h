@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Inventory.h"
+#include "systems/Inventory.h"
 
 class Player {
 public:

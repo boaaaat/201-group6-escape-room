@@ -1,18 +1,25 @@
 #include "ScramblePuzzle.h"
 #include <iostream>
+#include <string>
 
-// ctor:
-//  - store wordPairs like {{"KCSO","SOCK"}, ...}
 ScramblePuzzle::ScramblePuzzle(std::vector<std::pair<std::string,std::string>> wordPairs)
-    : pairs(wordPairs) {}
+    : pairs(std::move(wordPairs)) {}
 
-// play():
-//  - For each pair:
-//      - print scrambled
-//      - read player guess
-//      - if any guess wrong, print fail text and return false
-//  - if all correct, print success text and return true
-bool ScramblePuzzle::play() {
-    // TODO
-    return false;
+bool ScramblePuzzle::play() 
+{
+    std::cout << "[BASKET] \"Prove you can match what is scrambled!\"\n";
+
+    for (auto& p : pairs) {
+        std::cout << "Unscramble this word: " << p.first << "\n> ";
+        std::string guess;
+        std::getline(std::cin, guess);
+
+        if (guess != p.second) {
+            std::cout << "[BASKET] \"No match! Tragic. Try again once you're less useless.\"\n";
+            return false;
+        }
+    }
+
+    std::cout << "[BASKET] \"Impressive. Balance returns to laundry.\"\n";
+    return true;
 }

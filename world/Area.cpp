@@ -1,26 +1,65 @@
 #include "Area.h"
 #include <iostream>
 
-// observe():
-//  - print area name and description
-//  - print list of interactable objects that are not alreadyUsed
-//  - print list of doors with direction and locked/unlocked
 void Area::observe() const {
-    // TODO
+    std::cout << "=== " << displayName << " ===\n";
+    std::cout << description << "\n";
+
+    // list objects
+    bool anyObjects = false;
+    for (const auto& kv : objects) {
+        const auto& objName = kv.first;
+        const auto& data = kv.second;
+        if (!data.alreadyUsed) {
+            if (!anyObjects) {
+                std::cout << "You notice:\n";
+                anyObjects = true;
+            }
+            std::cout << " - " << objName << ": " << data.desc << "\n";
+        }
+    }
+    if (!anyObjects) {
+        std::cout << "Nothing else here looks interactive.\n";
+    }
+
+    // list doors
+    if (!doors.empty()) {
+        std::cout << "Exits:\n";
+        for (const auto& kv : doors) {
+            const auto& dir = kv.first;
+            const auto& d = kv.second;
+            std::cout << " - " << dir << " -> " << d.getName();
+            if (d.locked()) {
+                std::cout << " [LOCKED: " << d.getLockedText() << "]";
+            }
+            std::cout << "\n";
+        }
+    }
 }
 
-// interact(objectName, inv):
-//  - check if object exists
-//  - if doesn't exist: print "there's nothing like that here"
-//  - if exists:
-//      - print desc / flavor text
-//      - if not alreadyUsed:
-//          - add reward item to inventory
-//          - set alreadyUsed = true if singleUse
 void Area::interact(const std::string& objectName,
                     Inventory& inv) {
-    // TODO
-    (void)inv;
+    auto it = objects.find(objectName);
+    if (it == objects.end()) {
+        std::cout << "There's nothing called '" << objectName << "' here.\n";
+        return;
+    }
+
+    ObjectData& data = it->second;
+    std::cout << data.desc << "\n";
+
+    if (!data.alreadyUsed) {
+        // give reward item
+        if (data.reward.getName() != "") {
+            std::cout << "You obtain: " << data.reward.getName() << "\n";
+            inv.addItem(data.reward);
+        }
+        if (data.singleUse) {
+            data.alreadyUsed = true;
+        }
+    } else {
+        std::cout << "You've already searched that.\n";
+    }
 }
 
 void Area::addDoor(const std::string& direction, const Door& d) {
@@ -33,12 +72,14 @@ Door* Area::getDoor(const std::string& direction) {
     return &(it->second);
 }
 
-// addObject():
-//  - create ObjectData from args
-//  - insert into objects map
 void Area::addObject(const std::string& objectName,
                      const std::string& objectDesc,
                      const Item& rewardItem,
                      bool singleUse) {
-    // TODO
+    ObjectData data;
+    data.desc = objectDesc;
+    data.reward = rewardItem;
+    data.singleUse = singleUse;
+    data.alreadyUsed = false;
+    objects[objectName] = data;
 }

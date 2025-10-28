@@ -4,6 +4,6 @@
 class Puzzle {
 public:
     virtual ~Puzzle() {}
-    virtual bool play() = 0;          // run the puzzle interaction
+    virtual bool play() = 0;
     virtual std::string getName() const = 0;
 };

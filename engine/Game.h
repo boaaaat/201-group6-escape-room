@@ -38,6 +38,7 @@ private:
     void cmdRecipes();
     void cmdHint();
     void cmdInfo(const std::vector<std::string>& args);
+    void cmdInventory();
 
     // utility:
     //  get current room ptr from world using player.currentRoomId

@@ -1,15 +1,14 @@
 #include "WorldMap.h"
 
-// registerRoom:
-//  - insert into rooms keyed by room->getId()
-void WorldMap::registerRoom(std::unique_ptr<Room> room) {
-    // TODO
+void WorldMap::registerRoom(std::unique_ptr<Room> room) 
+{
+    std::string id = room->getId();
+    rooms[id] = std::move(room);
 }
 
-// getRoom:
-//  - find in map
-//  - return ptr or nullptr
-Room* WorldMap::getRoom(const std::string& roomId) {
-    // TODO
-    return nullptr;
+Room* WorldMap::getRoom(const std::string& roomId) 
+{
+    auto it = rooms.find(roomId);
+    if (it == rooms.end()) return nullptr;
+    return it->second.get();
 }

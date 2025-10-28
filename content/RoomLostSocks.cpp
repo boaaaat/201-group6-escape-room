@@ -1,71 +1,183 @@
 #include "RoomLostSocks.h"
-#include "systems/CraftRecipe.h"
 #include <iostream>
 
-// ctor:
-//  - call Room ctor with ids/names/text
-//  - initialize gatePuzzle with word pairs
-//  - call buildAreas() to define the internal layout
-RoomLostSocks::RoomLostSocks()
+RoomLostSocks::RoomLostSocks(CraftingSystem& craftRef)
     : Room(
         "lost_socks",
         "Lobby of Lost Socks",
-        "You step into a warm, sock-scented dimension. A glowing laundry basket blocks the exit.\n"
-        "CLERK (distant): \"Only the truly matched may pass...\""
+        "You step into a warm, sock-scented dimension. Piles of single socks float and whisper.\n"
+        "A glowing laundry basket blocks what looks like an exit portal."
       ),
       gatePuzzle({
           {"KCSO",  "SOCK"},
           {"HCTAM", "MATCH"},
           {"RIAP",  "PAIR"}
-      })
+      }),
+      craftingRef(craftRef)
 {
-    // TODO: buildAreas();
-    // NOTE: you should also register starting crafting recipe here, e.g.:
-    // Matched Pair = Sock of Truth (L) + Sock of Truth (R)
-    //
-    // HOWEVER: crafting recipes live in CraftingSystem, which is owned by Game,
-    // so you'll likely expose a method later like RoomLostSocks::registerRecipes(CraftingSystem&).
+    // Teach recipe for Matched Pair at room creation
+    CraftRecipe pairRecipe;
+    pairRecipe.ingredients = { "Sock of Truth (L)", "Sock of Truth (R)" };
+    pairRecipe.resultName  = "Matched Pair";
+    pairRecipe.resultDesc  = "Both Socks of Truth finally reunited. They hum in harmony.";
+    pairRecipe.resultTip   = "The laundry basket only respects properly matched love.";
+    craftingRef.addRecipe(pairRecipe);
+
+    buildAreas();
 }
 
-// getStartAreaId():
-//  - return the area where the player first spawns in this room,
-//    e.g. "sock_mountain"
 std::string RoomLostSocks::getStartAreaId() const {
-    // TODO
     return "sock_mountain";
 }
 
-// attemptFinalPuzzle():
-//  - check Inventory for "Matched Pair"
-//  - if missing, print "basket: you are unworthy"
-//  - else run gatePuzzle.play()
-//  - if solved:
-//       - set solved = true
-//       - find the Area/door that leads to Pantry (e.g. "exit_portal")
-//       - unlock that door so player can `move east` (which changes room)
-bool RoomLostSocks::attemptFinalPuzzle(Inventory& inv, CraftingSystem& crafting) {
-    // TODO
-    (void)inv;
-    (void)crafting;
-    return false;
+bool RoomLostSocks::attemptFinalPuzzle(Inventory& inv,
+                                       CraftingSystem& crafting) {
+    // require the crafted "Matched Pair"
+    if (!inv.hasItem("Matched Pair")) {
+        std::cout << "BASKET: \"You dare challenge me WITHOUT a matched pair?\"\n";
+        std::cout << "BASKET: \"Return when your socks know true love.\"\n";
+        return false;
+    }
+
+    // run Scramble puzzle:
+    bool solved = gatePuzzle.play();
+    if (!solved) {
+        // wrong answer, still locked
+        return false;
+    }
+
+    std::cout << "The glowing laundry basket vibrates with approval.\n";
+    std::cout << "\"Proceed... and may your pairs be ever complete.\"\n";
+
+    solved = true;
+    this->solved = true;
+
+    // unlock exit door
+    unlockExitDoor();
+
+    return true;
 }
 
-// buildAreas():
-//  - Create Area("sock_mountain", "Mount Sockmore", "...description...")
-//      - addObject("sockpile", "...dig description...",
-//                  Item("Sock of Truth (L)","A left sock buzzing with cosmic static.",true,
-//                        "Probably needs its partner."),
-//                  /*singleUse=*/true)
-//      - addDoor("east", Door("Path to Fuzzy Desk", "lost_socks", "fuzzy_desk", false,""))
-//  - Create Area("fuzzy_desk", ...)
-//      - addObject("desk", "...you find Right Sock... Sock of Truth (R)...", Item(...))
-//      - addDoor("west", back to sock_mountain)
-//      - addDoor("south", Dryer Portal area)
-//  - Create Area("dryer_portal", ...)
-//      - addDoor("north", "fuzzy_desk")
-//      - addDoor("exit", Door("Portal to Pantry", "pantry", "pantry_entry", /*locked=*/true,
-//                             "The laundry basket blocks your way. It demands PROOF OF MATCHING."))
-//  - Insert all these Area objects into `areas` map by areaId
+void RoomLostSocks::unlockExitDoor() {
+    // We know the exit door lives in dryer_portal, direction "exit"
+    Area* a = getArea("dryer_portal");
+    if (!a) return;
+    Door* d = a->getDoor("exit");
+    if (!d) return;
+    d->unlock();
+}
+
+// buildAreas constructs the Areas and their doors/objects.
 void RoomLostSocks::buildAreas() {
-    // TODO
+    // sock_mountain
+    Area sockMountain(
+        "sock_mountain",
+        "Mount Sockmore",
+        "A hill of tangled socks from every known universe. Some of them hum breakup songs."
+    );
+    sockMountain.addObject(
+        "sockpile",
+        "You dig into the sock pile. The air smells like static and heartbreak.\n"
+        "A lonely sock wriggles into your hand, whispering: \"I miss Righty...\"",
+        Item(
+            "Sock of Truth (L)",
+            "A left sock buzzing with cosmic static. It vibrates with desperate loyalty.",
+            true,
+            "Probably needs its partner. It won't feel 'complete' alone."
+        ),
+        /*singleUse=*/true
+    );
+    sockMountain.addDoor(
+        "east",
+        Door(
+            "Path toward a fuzzy desk covered in crumbs",
+            "lost_socks",
+            "fuzzy_desk",
+            false,
+            ""
+        )
+    );
+
+    // fuzzy_desk
+    Area fuzzyDesk(
+        "fuzzy_desk",
+        "The Fuzzy Desk",
+        "An ancient office desk covered in lint and snack crumbs. A sticky note reads:\n"
+        "\"KCSO -> SOCK. Remember this.\""
+    );
+    fuzzyDesk.addObject(
+        "desk",
+        "You rummage through the fuzzy drawers.\n"
+        "You find: Sock of Truth (R). It says \"Did Lefty ask about me?\"",
+        Item(
+            "Sock of Truth (R)",
+            "A right sock pulsing with insecure energy. It just wants to be loved.",
+            true,
+            "If reunited with Lefty, something powerful might happen."
+        ),
+        /*singleUse=*/true
+    );
+
+    fuzzyDesk.addDoor(
+        "west",
+        Door(
+            "Back toward Mount Sockmore",
+            "lost_socks",
+            "sock_mountain",
+            false,
+            ""
+        )
+    );
+    fuzzyDesk.addDoor(
+        "south",
+        Door(
+            "A corner where a dryer hums like a miniature wormhole",
+            "lost_socks",
+            "dryer_portal",
+            false,
+            ""
+        )
+    );
+
+    // dryer_portal
+    Area dryerPortal(
+        "dryer_portal",
+        "Dryer Portal Corner",
+        "A dryer shaped like a tiny black hole. A glowing laundry basket floats in front of\n"
+        "a shimmering EXIT PORTAL. The basket stares at you without eyes."
+    );
+
+    dryerPortal.addObject(
+        "basket",
+        "The basket booms:\n"
+        "\"ONLY MATCHED LOVE MAY PASS. SPELL YOUR WORTH.\"\n"
+        "Yeah, it's dramatic.",
+        Item("", "", false, ""),
+        /*singleUse=*/false
+    );
+
+    dryerPortal.addDoor(
+        "north",
+        Door(
+            "Back to the fuzzy desk",
+            "lost_socks",
+            "fuzzy_desk",
+            false,
+            ""
+        )
+    );
+    dryerPortal.addDoor(
+        "exit",
+        Door(
+            "Portal to The Pantry of Misplaced Snacks",
+            "pantry",          // <- next big room id
+            "pantry_entry",    // <- starting area in that room
+            true,
+            "The laundry basket blocks the way, demanding PROOF OF MATCHING."
+        )
+    );
+
+    areas["sock_mountain"] = sockMountain;
+    areas["fuzzy_desk"] = fuzzyDesk;
+    areas["dryer_portal"] = dryerPortal;
 }

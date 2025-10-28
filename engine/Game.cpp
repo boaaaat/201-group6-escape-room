@@ -1,139 +1,299 @@
 #include "Game.h"
 #include "CommandParser.h"
-#include "RoomLostSocks.h"
+#include "../content/RoomLostSocks.h"
+#include "../world/Room.h"
 #include <iostream>
+#include <algorithm>
 
-// Game():
-//  - register rooms in world (Lost Socks, Pantry, etc.)
-//  - set player's starting room/area
-//  - set up crafting recipes known at start (if any)
-//  - register hints
+class RoomPantryStub : public Room 
+{
+public:
+    RoomPantryStub()
+        : Room(
+            "pantry",
+            "The Pantry of Misplaced Snacks",
+            "You step into a kitchen-like space stacked with half-eaten chips and cursed Tupperware.\n"
+            "The fridge hums nervously."
+        )
+    {
+        Area entry(
+            "pantry_entry",
+            "Crumb Floor",
+            "You are standing in sticky crumbs. Something smells... historical."
+        );
+        // Add at least one door back to socks room for now:
+        entry.addDoor(
+            "back",
+            Door(
+                "Portal shimmering back to the sock dimension",
+                "lost_socks",
+                "dryer_portal",
+                false,
+                ""
+            )
+        );
+        areas["pantry_entry"] = entry;
+    }
+
+    std::string getStartAreaId() const override {
+        return "pantry_entry";
+    }
+
+    bool attemptFinalPuzzle(Inventory& inv,
+                            CraftingSystem& crafting) override {
+        (void)inv;
+        (void)crafting;
+        std::cout << "The fridge mumbles: \"Pantry puzzle not implemented yet.\"\n";
+        return false;
+    }
+};
+
+
+
+// ===== Game Implementation =====
+
 Game::Game() {
-    // TODO:
-    // 1. world.registerRoom(std::make_unique<RoomLostSocks>());
-    // 2. player.currentRoomId = "lost_socks";
-    //    player.currentAreaId = <LostSocks start area id>;
-    // 3. maybe pre-load a basic recipe or none yet
-    // 4. hints.registerHint("area:sock_mountain", "Try digging in the sock pile...");
+    // Register rooms.
+    // Lost Socks room needs CraftingSystem reference so it can inject recipes.
+    world.registerRoom(std::make_unique<RoomLostSocks>(crafting));
+    world.registerRoom(std::make_unique<RoomPantryStub>());
+
+    // Starting location
+    player.currentRoomId = "lost_socks";
+    Room* startRoom = world.getRoom(player.currentRoomId);
+    if (startRoom) {
+        player.currentAreaId = startRoom->getStartAreaId();
+        startRoom->enterRoomIntro();
+    }
+
+    // Register some basic hints for areas
+    hints.registerHint(
+        "area:sock_mountain",
+        "Try 'interact sockpile'. Something might be buried in the fluff."
+    );
+    hints.registerHint(
+        "area:fuzzy_desk",
+        "Maybe 'interact desk'. The sticky note looks suspicious."
+    );
+    hints.registerHint(
+        "area:dryer_portal",
+        "If you're stuck, craft \"Matched Pair\" and then try 'solve'."
+    );
 }
 
-// run():
-//  - print global intro (clerk scene)
-//  - loop until quit command
-//  - each loop:
-//      - fetch room+area
-//      - ask for input
-//      - parse
-//      - dispatch based on first token:
-//          move / observe / interact / craft / uncraft / recipes
-//          / hint / info / inv / quit
 void Game::run() {
-    // TODO:
-    // print story setup
-    // while true:
-    //   1. prompt ">"
-    //   2. getline
-    //   3. tokenize
-    //   4. if empty continue
-    //   5. if cmd == "quit", break
-    //   6. else if "move": cmdMove(args...)
-    //   7. else if "observe": cmdObserve()
-    //   8. else if "interact": cmdInteract(args...)
-    //   9. else if "craft": cmdCraft(args...)
-    //   10. else if "uncraft": cmdUncraft()
-    //   11. else if "recipes": cmdRecipes()
-    //   12. else if "hint": cmdHint()
-    //   13. else if "info": cmdInfo(args...)
-    //   14. else if "inv": player.getInventory().listItems();
-    //   15. else if "solve" (optional): tryRoomFinalPuzzle();
-    //   16. else print "unknown command"
+    std::cout << "[You awaken in the Interdimensional Lost & Found...]\n";
+    std::cout << "CLERK: \"Four rooms. Four proofs. Reclaim yourself.\"\n";
+
+    while (true) {
+        std::cout << "\n> ";
+        std::string line;
+        if (!std::getline(std::cin, line)) break;
+
+        auto tokens = CommandParser::tokenize(line);
+        if (tokens.empty()) continue;
+
+        // lowercase the command verb
+        std::string cmd = tokens[0];
+        std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+
+        std::vector<std::string> args;
+        if (tokens.size() > 1) {
+            args.assign(tokens.begin() + 1, tokens.end());
+        }
+
+        if (cmd == "quit" || cmd == "exit") {
+            std::cout << "You fade out of this dimension...\n";
+            break;
+
+        } else if (cmd == "move") {
+            cmdMove(args);
+
+        } else if (cmd == "observe") {
+            cmdObserve();
+
+        } else if (cmd == "interact") {
+            cmdInteract(args);
+
+        } else if (cmd == "craft") {
+            cmdCraft(args);
+
+        } else if (cmd == "uncraft") {
+            cmdUncraft();
+
+        } else if (cmd == "recipes") {
+            cmdRecipes();
+
+        } else if (cmd == "hint") {
+            cmdHint();
+
+        } else if (cmd == "info") {
+            cmdInfo(args);
+
+        } else if (cmd == "inv" || cmd == "inventory") {
+            cmdInventory();
+
+        } else if (cmd == "solve") {
+            tryRoomFinalPuzzle();
+
+        } else {
+            std::cout << "Unknown command. Try:\n";
+            std::cout << "  move / observe / interact / craft / uncraft / recipes / hint / info / inv / solve / quit\n";
+        }
+    }
 }
 
-// cmdMove(args):
-//  - args[0] should be direction ("north","east", etc.)
-//  - look at current Area's doors map
-//  - if door exists in that direction:
-//        - if locked -> print lockedText
-//        - else:
-//            - update player's currentRoomId / currentAreaId from door target
-//            - if new room is different: call room->enterRoomIntro()
-//  - if no door -> tell player no path
-void Game::cmdMove(const std::vector<std::string>& args) {
-    // TODO
-    (void)args;
-}
-
-// cmdObserve():
-//  - get current area and call area->observe()
-void Game::cmdObserve() {
-    // TODO
-}
-
-// cmdInteract(args):
-//  - args[0] should be objectName
-//  - call area->interact(objectName, player.getInventory())
-//  - this might give items, unlock hints, etc.
-void Game::cmdInteract(const std::vector<std::string>& args) {
-    // TODO
-    (void)args;
-}
-
-// cmdCraft(args):
-//  - args[0] should be itemName we want to craft ("Matched Pair")
-//  - crafting.craft(player.getInventory(), itemName)
-void Game::cmdCraft(const std::vector<std::string>& args) {
-    // TODO
-    (void)args;
-}
-
-// cmdUncraft():
-//  - crafting.uncraft(player.getInventory())
-void Game::cmdUncraft() {
-    // TODO
-}
-
-// cmdRecipes():
-//  - crafting.listRecipes()
-void Game::cmdRecipes() {
-    // TODO
-}
-
-// cmdHint():
-//  - ask HintSystem using current area's hint context
-//  - hints.getHint(area->getHintContextId(), player.getInventory())
-void Game::cmdHint() {
-    // TODO
-}
-
-// cmdInfo(args):
-//  - args[0] = itemName
-//  - player.getInventory().describeItem(itemName)
-void Game::cmdInfo(const std::vector<std::string>& args) {
-    // TODO
-    (void)args;
-}
-
-// getCurrentRoom():
-//  - world.getRoom(player.currentRoomId)
 Room* Game::getCurrentRoom() {
-    // TODO
-    return nullptr;
+    return world.getRoom(player.currentRoomId);
 }
 
-// getCurrentArea():
-//  - getCurrentRoom()
-//  - room->getArea(player.currentAreaId)
 Area* Game::getCurrentArea() {
-    // TODO
-    return nullptr;
+    Room* r = getCurrentRoom();
+    if (!r) return nullptr;
+    return r->getArea(player.currentAreaId);
 }
 
-// tryRoomFinalPuzzle():
-//  - get current room
-//  - call room->attemptFinalPuzzle(player.getInventory(), crafting)
-//  - if solved:
-//      - unlock the exit door in some special area
-//      - maybe print "The exit to the next dimension hums open..."
+void Game::cmdMove(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cout << "Move where? (example: move east)\n";
+        return;
+    }
+    std::string direction = args[0];
+
+    Area* area = getCurrentArea();
+    Room* room = getCurrentRoom();
+    if (!area || !room) {
+        std::cout << "You feel spatially confused. (No current area/room.)\n";
+        return;
+    }
+
+    const auto& doors = area->getDoors();
+    auto it = doors.find(direction);
+    if (it == doors.end()) {
+        std::cout << "There's no exit that way.\n";
+        return;
+    }
+
+    const Door& d = it->second;
+    if (d.locked()) {
+        std::cout << d.getLockedText() << "\n";
+        return;
+    }
+
+    std::string targetRoomId = d.getTargetRoom();
+    std::string targetAreaId = d.getTargetArea();
+
+    // move
+    player.currentRoomId = targetRoomId;
+    player.currentAreaId = targetAreaId;
+
+    Room* newRoom = getCurrentRoom();
+    if (newRoom && newRoom != room) {
+        // entering a new major room => intro
+        newRoom->enterRoomIntro();
+    }
+
+    // auto observe new area
+    cmdObserve();
+}
+
+void Game::cmdObserve() {
+    Area* area = getCurrentArea();
+    if (!area) {
+        std::cout << "You stare into the void. Nothing stares back. (Area not found)\n";
+        return;
+    }
+    area->observe();
+}
+
+void Game::cmdInteract(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cout << "Interact with what?\n";
+        return;
+    }
+
+    Area* area = getCurrentArea();
+    if (!area) {
+        std::cout << "You reach out, but reality is missing.\n";
+        return;
+    }
+
+    // join all args back into one objectName (to support multiword)
+    std::string objectName = args[0];
+    for (size_t i = 1; i < args.size(); ++i) {
+        objectName += " ";
+        objectName += args[i];
+    }
+
+    area->interact(objectName, player.getInventory());
+}
+
+void Game::cmdCraft(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cout << "Craft what? (Use recipes to see options)\n";
+        return;
+    }
+
+    // join args to support multi-word items
+    std::string itemName = args[0];
+    for (size_t i = 1; i < args.size(); ++i) {
+        itemName += " ";
+        itemName += args[i];
+    }
+
+    crafting.craft(player.getInventory(), itemName);
+}
+
+void Game::cmdUncraft() {
+    crafting.uncraft(player.getInventory());
+}
+
+void Game::cmdRecipes() {
+    crafting.listRecipes();
+}
+
+void Game::cmdHint() {
+    Area* area = getCurrentArea();
+    if (!area) {
+        std::cout << "You attempt to request cosmic guidance, but you are nowhere.\n";
+        return;
+    }
+    std::string ctx = area->getHintContextId();
+    hints.getHint(ctx, player.getInventory());
+}
+
+void Game::cmdInfo(const std::vector<std::string>& args) {
+    if (args.empty()) {
+        std::cout << "Info on what item?\n";
+        return;
+    }
+
+    // join args into item name
+    std::string itemName = args[0];
+    for (size_t i = 1; i < args.size(); ++i) {
+        itemName += " ";
+        itemName += args[i];
+    }
+
+    player.getInventory().describeItem(itemName);
+}
+
+void Game::cmdInventory() 
+{
+    player.getInventory().listItems();
+}
+
 void Game::tryRoomFinalPuzzle() {
-    // TODO
+    Room* r = getCurrentRoom();
+    if (!r) {
+        std::cout << "You can't solve a room that doesn't exist.\n";
+        return;
+    }
+
+    bool before = r->isSolved();
+    bool after = r->attemptFinalPuzzle(player.getInventory(), crafting);
+
+    if (!before && after) {
+        std::cout << "[A new exit shimmers open. Try 'move exit'.]\n";
+    }
 }
