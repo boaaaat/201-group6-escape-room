@@ -18,6 +18,9 @@
                 "engine/Game.cpp",
                 "engine/CommandParser.cpp",
                 "engine/Helpers.cpp",
+                "engine/AudioEngine.cpp",
+                "engine/Dialogue.cpp",
+                "engine/EventSystem.cpp",
 
                 "world/WorldMap.cpp",
                 "world/Room.cpp",
@@ -35,6 +38,7 @@
                 "-static-libgcc",
                 "-static-libstdc++",
                 "-static-libgcc",
+                "-lwinmm",
 
                 "-o",
                 "game.exe"

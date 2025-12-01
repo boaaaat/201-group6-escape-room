@@ -1,11 +1,12 @@
 #include "Room.h"
 #include <iostream>
+#include "../engine/AudioEngine.h"
 
 // enterRoomIntro():
 //   - print intro text / flavor
 //   - could run NPC dialogue for that room
-void Room::enterRoomIntro() {
-    // TODO
+void Room::enterRoomIntro(AudioEngine* audioEngine) {
+    intro.deliver(audioEngine);
 }
 
 Area* Room::getArea(const std::string& areaId) {

@@ -1,9 +1,12 @@
 #include "Area.h"
 #include <iostream>
 
-void Area::observe() const {
+#include "../engine/AudioEngine.h"
+
+void Area::observe(AudioEngine* audioEngine) const {
     std::cout << "=== " << displayName << " ===\n";
-    std::cout << description << "\n\n";
+    description.deliver(audioEngine);
+    std::cout << "\n";
 
     // list objects
     bool anyObjects = false;
@@ -31,7 +34,11 @@ void Area::observe() const {
             const auto& d = kv.second;
             std::cout << " - " << dir << " -> " << d.getName();
             if (d.locked()) {
-                std::cout << " [LOCKED: " << d.getLockedText() << "]";
+                if (d.getLockedDialogue().has_value()) {
+                    std::cout << " [LOCKED: " << d.getLockedDialogue()->getText() << "]";
+                } else {
+                    std::cout << " [LOCKED: " << d.getLockedText() << "]";
+                }
             }
             std::cout << "\n";
         }
@@ -39,7 +46,8 @@ void Area::observe() const {
 }
 
 void Area::interact(const std::string& objectName,
-                    Inventory& inv) {
+                    Inventory& inv,
+                    AudioEngine* audioEngine) {
     auto it = objects.find(objectName);
     if (it == objects.end()) {
         std::cout << "There's nothing called '" << objectName << "' here.\n";
@@ -47,7 +55,7 @@ void Area::interact(const std::string& objectName,
     }
 
     ObjectData& data = it->second;
-    std::cout << data.desc << "\n";
+    data.dialogue.deliver(audioEngine);
 
     if (!data.alreadyUsed) {
         // give reward item
@@ -77,10 +85,23 @@ void Area::addObject(const std::string& objectName,
                      const std::string& objectDesc,
                      const Item& rewardItem,
                      bool singleUse) {
+    addObject(objectName, Dialogue(objectDesc), rewardItem, singleUse);
+}
+
+void Area::addObject(const std::string& objectName,
+                     const Dialogue& dialogue,
+                     const Item& rewardItem,
+                     bool singleUse) {
     ObjectData data;
-    data.desc = objectDesc;
+    data.dialogue = dialogue;
     data.reward = rewardItem;
     data.singleUse = singleUse;
     data.alreadyUsed = false;
     objects[objectName] = data;
+}
+
+void Area::setObjectDialogue(const std::string& objectName, const Dialogue& dlg) {
+    auto it = objects.find(objectName);
+    if (it == objects.end()) return;
+    it->second.dialogue = dlg;
 }

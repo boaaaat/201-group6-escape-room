@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <optional>
+#include "../engine/Dialogue.h"
 
 // Door connects one Area to another Area (or exits to a new Room).
 // A door can be locked behind puzzle conditions.
@@ -9,12 +11,14 @@ public:
          std::string leadsToRoom = "",
          std::string leadsToArea = "",
          bool locked = false,
-         std::string lockReason = "")
+         std::string lockReason = "",
+         std::optional<Dialogue> lockDialogue = std::nullopt)
         : name(name),
           targetRoom(leadsToRoom),
           targetArea(leadsToArea),
           isLocked(locked),
-          lockedText(lockReason) {}
+          lockedText(lockReason),
+          lockedDialogue(lockDialogue) {}
 
     std::string getName() const { return name; }
 
@@ -28,9 +32,12 @@ public:
 
     // called when we try to use the door but it's locked
     std::string getLockedText() const { return lockedText; }
+    const std::optional<Dialogue>& getLockedDialogue() const { return lockedDialogue; }
 
     // unlock when puzzle solved
-    void unlock() { isLocked = false; lockedText = ""; }
+    void unlock() { isLocked = false; lockedText = ""; lockedDialogue.reset(); }
+
+    void setLockedDialogue(const Dialogue& dlg) { lockedDialogue = dlg; }
 
 private:
     std::string name;
@@ -38,4 +45,5 @@ private:
     std::string targetArea;
     bool isLocked;
     std::string lockedText;
+    std::optional<Dialogue> lockedDialogue;
 };

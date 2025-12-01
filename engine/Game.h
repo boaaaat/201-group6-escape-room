@@ -4,6 +4,8 @@
 #include "WorldMap.h"
 #include "CraftingSystem.h"
 #include "HintSystem.h"
+#include "AudioEngine.h"
+#include "EventSystem.h"
 
 // Game drives the loop:
 // - prints intro
@@ -28,6 +30,8 @@ private:
     WorldMap world;
     CraftingSystem crafting;
     HintSystem hints;
+    AudioEngine audio;
+    EventSystem events;
 
     // helper functions for commands:
     void cmdMove(const std::vector<std::string>& args);
@@ -39,6 +43,7 @@ private:
     void cmdHint();
     void cmdInfo(const std::vector<std::string>& args);
     void cmdInventory();
+    void cmdPlayAudio(const std::vector<std::string>& args);
 
     // utility:
     //  get current room ptr from world using player.currentRoomId

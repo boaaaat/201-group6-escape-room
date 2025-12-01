@@ -6,6 +6,9 @@
 #include "Inventory.h"
 #include "CraftingSystem.h"
 #include "Puzzle.h"
+#include "../engine/Dialogue.h"
+
+class AudioEngine;
 
 // A Room is a major chapter (Lost Socks, Pantry, etc.).
 // It owns multiple Areas and one final gate puzzle.
@@ -14,7 +17,7 @@ class Room {
 public:
     Room(std::string id = "",
          std::string niceName = "",
-         std::string introText = "")
+         Dialogue introText = Dialogue(""))
         : roomId(id), displayName(niceName),
           intro(introText), solved(false) {}
 
@@ -22,9 +25,11 @@ public:
 
     std::string getId() const { return roomId; }
     std::string getDisplayName() const { return displayName; }
+    void setIntroDialogue(const Dialogue& dlg) { intro = dlg; }
+    const Dialogue& getIntroDialogue() const { return intro; }
 
     // called when player first (or re-)enters the room
-    virtual void enterRoomIntro();
+    virtual void enterRoomIntro(AudioEngine* audioEngine = nullptr);
 
     // get current Area object
     Area* getArea(const std::string& areaId);
@@ -49,7 +54,7 @@ public:
 protected:
     std::string roomId;
     std::string displayName;
-    std::string intro;
+    Dialogue intro;
     bool solved;
 
     // map of areaId -> Area

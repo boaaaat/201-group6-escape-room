@@ -6,6 +6,9 @@
 #include "Item.h"
 #include "Inventory.h"
 #include "HintSystem.h"
+#include "../engine/Dialogue.h"
+
+class AudioEngine;
 
 // An Area is an explorable sub-location inside a Room.
 // Example: "Mount Sockmore" is an Area inside the Lost Socks Room.
@@ -13,7 +16,7 @@ class Area {
 public:
     Area(std::string id = "",
          std::string niceName = "",
-         std::string desc = "")
+         Dialogue desc = Dialogue(""))
         : areaId(id), displayName(niceName), description(desc) {}
 
     std::string getId() const { return areaId; }
@@ -23,13 +26,14 @@ public:
     //  - print description of area
     //  - list visible interactable objects
     //  - list doors
-    void observe() const;
+    void observe(AudioEngine* audioEngine = nullptr) const;
 
     // interact(objectName, inv):
     //  - handle things like "dig pile", "search desk", etc.
     //  - may add items to inventory
     void interact(const std::string& objectName,
-                  Inventory& inv);
+                  Inventory& inv,
+                  AudioEngine* audioEngine = nullptr);
 
     // list doors so the player knows possible move directions
     const std::map<std::string, Door>& getDoors() const { return doors; }
@@ -46,13 +50,20 @@ public:
                    const std::string& objectDesc,
                    const Item& rewardItem,
                    bool singleUse);
+    void addObject(const std::string& objectName,
+                   const Dialogue& dialogue,
+                   const Item& rewardItem,
+                   bool singleUse);
+
+    void setDescriptionDialogue(const Dialogue& dlg) { description = dlg; }
+    void setObjectDialogue(const std::string& objectName, const Dialogue& dlg);
 
     // called by hint system to decide what hint to show
     std::string getHintContextId() const { return "area:" + areaId; }
 
 private:
     struct ObjectData {
-        std::string desc;
+        Dialogue dialogue;
         Item reward;
         bool singleUse = false;
         bool alreadyUsed = false;
@@ -60,7 +71,7 @@ private:
 
     std::string areaId;        // internal key e.g. "sock_mountain"
     std::string displayName;   // "Mount Sockmore"
-    std::string description;   // long description for observe()
+    Dialogue description;      // long description for observe()
     std::map<std::string, ObjectData> objects;
     std::map<std::string, Door> doors;
 };

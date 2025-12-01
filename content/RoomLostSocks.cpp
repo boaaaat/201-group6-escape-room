@@ -1,12 +1,13 @@
 #include "RoomLostSocks.h"
 #include <iostream>
+#include "../engine/Dialogue.h"
 
 RoomLostSocks::RoomLostSocks(CraftingSystem& craftRef)
     : Room(
         "lost_socks",
         "Lobby of Lost Socks",
-        "You step into a warm, sock-scented dimension. Piles of single socks float and whisper.\n"
-        "A glowing laundry basket blocks what looks like an exit portal."
+        Dialogue("You step into a warm, sock-scented dimension. Piles of single socks float and whisper.\n"
+        "A glowing laundry basket blocks what looks like an exit portal.", "speech\\RoomLostSocks\\room_intro.mp3")
       ),
       gatePuzzle({
           {"KCSO",  "SOCK"},
@@ -73,7 +74,7 @@ void RoomLostSocks::buildAreas() {
     Area sockMountain(
         "sock_mountain",
         "Mount Sockmore",
-        "A hill of tangled socks with a variety of different colors."
+        Dialogue("A hill of tangled socks with a variety of different colors.")
     );
     sockMountain.addObject(
         "sockpile",
@@ -102,8 +103,8 @@ void RoomLostSocks::buildAreas() {
     Area fuzzyDesk(
         "fuzzy_desk",
         "The Fuzzy Desk",
-        "An ancient office desk covered in dust and snack crumbs. A sticky note reads:\n"
-        "\"KCSO -> SOCK. Remember this.\""
+        Dialogue("An ancient office desk covered in dust and snack crumbs. A sticky note reads:\n"
+        "\"KCSO -> SOCK. Remember this.\"")
     );
     fuzzyDesk.addObject(
         "desk",
@@ -143,8 +144,8 @@ void RoomLostSocks::buildAreas() {
     Area dryerPortal(
         "dryer_portal",
         "Dryer Portal Corner",
-        "A dryer shaped like a tiny black hole. A glowing laundry basket floats in front of\n"
-        "a shimmering EXIT PORTAL. The basket stares at you menancingly."
+        Dialogue("A dryer shaped like a tiny black hole. A glowing laundry basket floats in front of\n"
+        "a shimmering EXIT PORTAL. The basket stares at you menancingly.")
     );
     
     dryerPortal.addObject(
@@ -173,7 +174,8 @@ void RoomLostSocks::buildAreas() {
             "pantry",          // <- next big room id
             "pantry_entry",    // <- starting area in that room
             true,
-            "The laundry basket blocks the way, demanding PROOF OF MATCHING."
+            "The laundry basket blocks the way, demanding PROOF OF MATCHING.",
+            Dialogue("The laundry basket blocks the way, demanding PROOF OF MATCHING.", "")
         )
     );
 
