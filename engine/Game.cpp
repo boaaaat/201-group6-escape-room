@@ -4,6 +4,7 @@
 #include "../world/Room.h"
 #include <iostream>
 #include <algorithm>
+#include <vector>
 #include <Helpers.h>
 
 // ===== Game Implementation =====
@@ -19,6 +20,7 @@ Game::Game() {
     if (startRoom) {
         player.currentAreaId = startRoom->getStartAreaId();
         startRoom->enterRoomIntro(&audio);
+        player.markVisited(player.currentRoomId, player.currentAreaId);
     }
 
     // Register some basic hints for areas
@@ -58,6 +60,7 @@ void Game::run() {
     std::cout << " hint (h)" << std::endl;
     std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
+    std::cout << " teleport (tp)" << std::endl;
     std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
     std::cout << " help (see the command list)\n";
 
@@ -115,6 +118,9 @@ void Game::run() {
         } else if (cmd == "audio" || cmd == "sound") {
             cmdPlayAudio(args);
 
+        } else if (cmd == "teleport" || cmd == "tp") {
+            cmdTeleport();
+
         } else if (cmd == "solve" || cmd == "s") {
             tryRoomFinalPuzzle();
 
@@ -130,6 +136,7 @@ void Game::run() {
             std::cout << " hint (h)" << std::endl;
             std::cout << " info <object> (i)" << std::endl;
             std::cout << " inv (see inventory)" << std::endl;
+            std::cout << " teleport (tp)" << std::endl;
             std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
         }
         else 
@@ -201,6 +208,7 @@ void Game::cmdMove(const std::vector<std::string>& args) {
     // move
     player.currentRoomId = targetRoomId;
     player.currentAreaId = targetAreaId;
+    player.markVisited(player.currentRoomId, player.currentAreaId);
 
     Room* newRoom = getCurrentRoom();
     if (newRoom && newRoom != room) {
@@ -342,6 +350,103 @@ void Game::cmdPlayAudio(const std::vector<std::string>& args) {
 void Game::cmdInventory() 
 {
     player.getInventory().listItems();
+}
+
+void Game::cmdTeleport() {
+    const auto& visitedRooms = player.getVisitedRooms();
+    if (visitedRooms.empty()) {
+        std::cout << "You haven't been anywhere to teleport to yet.\n";
+        return;
+    }
+
+    std::vector<std::string> roomIds(visitedRooms.begin(), visitedRooms.end());
+    std::cout << "=== Teleport: Visited Rooms ===\n";
+    for (size_t i = 0; i < roomIds.size(); ++i) {
+        Room* r = world.getRoom(roomIds[i]);
+        std::string name = (r ? r->getDisplayName() : roomIds[i]);
+        std::cout << (i + 1) << ". " << name << "\n";
+    }
+
+    std::cout << "Select room number (or press Enter to cancel): ";
+    std::string roomChoiceStr;
+    std::getline(std::cin, roomChoiceStr);
+    if (roomChoiceStr.empty()) {
+        std::cout << "Teleport cancelled.\n";
+        return;
+    }
+    if (!std::all_of(roomChoiceStr.begin(), roomChoiceStr.end(), ::isdigit)) {
+        std::cout << "Please enter a valid number.\n";
+        return;
+    }
+
+    size_t roomChoice = std::stoul(roomChoiceStr);
+    if (roomChoice == 0 || roomChoice > roomIds.size()) {
+        std::cout << "No room with that number.\n";
+        return;
+    }
+    std::string chosenRoomId = roomIds[roomChoice - 1];
+    Room* chosenRoom = world.getRoom(chosenRoomId);
+    if (!chosenRoom) {
+        std::cout << "That room no longer exists.\n";
+        return;
+    }
+
+    const auto& visitedAreas = player.getVisitedAreas(chosenRoomId);
+    if (visitedAreas.empty()) {
+        std::cout << "You haven't visited any areas in that room yet.\n";
+        return;
+    }
+
+    std::vector<std::string> areaIds;
+    for (const auto& id : visitedAreas) {
+        if (chosenRoom->hasArea(id)) {
+            areaIds.push_back(id);
+        }
+    }
+    if (areaIds.empty()) {
+        std::cout << "No valid areas to teleport to in that room.\n";
+        return;
+    }
+
+    std::cout << "=== Teleport: Areas in " << chosenRoom->getDisplayName() << " ===\n";
+    for (size_t i = 0; i < areaIds.size(); ++i) {
+        Area* a = chosenRoom->getArea(areaIds[i]);
+        std::string name = (a ? a->getDisplayName() : areaIds[i]);
+        std::cout << (i + 1) << ". " << name << "\n";
+    }
+
+    std::cout << "Select area number (or press Enter to cancel): ";
+    std::string areaChoiceStr;
+    std::getline(std::cin, areaChoiceStr);
+    if (areaChoiceStr.empty()) {
+        std::cout << "Teleport cancelled.\n";
+        return;
+    }
+    if (!std::all_of(areaChoiceStr.begin(), areaChoiceStr.end(), ::isdigit)) {
+        std::cout << "Please enter a valid number.\n";
+        return;
+    }
+
+    size_t areaChoice = std::stoul(areaChoiceStr);
+    if (areaChoice == 0 || areaChoice > areaIds.size()) {
+        std::cout << "No area with that number.\n";
+        return;
+    }
+
+    // execute teleport
+    std::string previousRoomId = player.currentRoomId;
+    Room* previousRoom = world.getRoom(previousRoomId);
+    player.currentRoomId = chosenRoomId;
+    player.currentAreaId = areaIds[areaChoice - 1];
+    player.markVisited(player.currentRoomId, player.currentAreaId);
+
+    Room* destinationRoom = world.getRoom(player.currentRoomId);
+    if (destinationRoom && destinationRoom != previousRoom) {
+        destinationRoom->enterRoomIntro(&audio);
+    }
+
+    std::cout << "\033[2J\033[1;1H";
+    cmdObserve();
 }
 
 void Game::tryRoomFinalPuzzle() {

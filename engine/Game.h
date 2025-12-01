@@ -44,6 +44,7 @@ private:
     void cmdInfo(const std::vector<std::string>& args);
     void cmdInventory();
     void cmdPlayAudio(const std::vector<std::string>& args);
+    void cmdTeleport();
 
     // utility:
     //  get current room ptr from world using player.currentRoomId
