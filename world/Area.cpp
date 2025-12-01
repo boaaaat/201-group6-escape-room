@@ -9,30 +9,25 @@ void Area::observe(AudioEngine* audioEngine) const {
     std::cout << "\n";
 
     // list objects
-    bool anyObjects = false;
-    for (const auto& kv : objects) {
-        const auto& objName = kv.first;
-        const auto& data = kv.second;
-        if (!data.alreadyUsed) {
-            if (!anyObjects) {
-                std::cout << "You notice:\n";
-                anyObjects = true;
-            }
-            std::cout << " - " << objName << "\n";
+    auto objectNames = getVisibleObjectNames();
+    if (!objectNames.empty()) {
+        std::cout << "You notice:\n";
+        for (size_t idx = 0; idx < objectNames.size(); ++idx) {
+            std::cout << " " << (idx + 1) << ". " << objectNames[idx] << "\n";
         }
-    }
-    if (!anyObjects) {
+    } else {
         std::cout << "Nothing else here looks interactive.\n";
     }
     std::cout << std::endl;
 
     // list doors
-    if (!doors.empty()) {
+    auto doorDirections = getDoorDirections();
+    if (!doorDirections.empty()) {
         std::cout << "Exits:\n";
-        for (const auto& kv : doors) {
-            const auto& dir = kv.first;
-            const auto& d = kv.second;
-            std::cout << " - " << dir << " -> " << d.getName();
+        for (size_t idx = 0; idx < doorDirections.size(); ++idx) {
+            const auto& dir = doorDirections[idx];
+            const auto& d = doors.at(dir);
+            std::cout << " " << (idx + 1) << ". " << dir << " -> " << d.getName();
             if (d.locked()) {
                 if (d.getLockedDialogue().has_value()) {
                     std::cout << " [LOCKED: " << d.getLockedDialogue()->getText() << "]";
@@ -104,4 +99,24 @@ void Area::setObjectDialogue(const std::string& objectName, const Dialogue& dlg)
     auto it = objects.find(objectName);
     if (it == objects.end()) return;
     it->second.dialogue = dlg;
+}
+
+std::vector<std::string> Area::getVisibleObjectNames() const {
+    std::vector<std::string> names;
+    for (const auto& kv : objects) {
+        const auto& objName = kv.first;
+        const auto& data = kv.second;
+        if (!data.alreadyUsed) {
+            names.push_back(objName);
+        }
+    }
+    return names;
+}
+
+std::vector<std::string> Area::getDoorDirections() const {
+    std::vector<std::string> dirs;
+    for (const auto& kv : doors) {
+        dirs.push_back(kv.first);
+    }
+    return dirs;
 }

@@ -51,7 +51,7 @@ void Game::run() {
     std::cout << "=== Commands: ===" << std::endl;
     std::cout << " move <direction> (m)" << std::endl;
     std::cout << " observe (obs)" << std::endl;
-    std::cout << " interact <object> (int)" << std::endl;
+    std::cout << " interact <object|number> (int)" << std::endl;
     std::cout << " craft <object name> (c)" << std::endl;
     std::cout << " uncraft (u)" << std::endl;
     std::cout << " recipes (r)" << std::endl;
@@ -122,9 +122,9 @@ void Game::run() {
         } 
         else if (cmd == "help") {
             std::cout << "=== Commands: ===" << std::endl;
-            std::cout << " move <direction> (m)" << std::endl;
-            std::cout << " observe (obs)" << std::endl;
-            std::cout << " interact <object> (int)" << std::endl;
+    std::cout << " move <direction|number> (m)" << std::endl;
+    std::cout << " observe (obs)" << std::endl;
+    std::cout << " interact <object|number> (int)" << std::endl;
             std::cout << " craft <object name> (c)" << std::endl;
             std::cout << " uncraft (u)" << std::endl;
             std::cout << " recipes (r)" << std::endl;
@@ -167,7 +167,19 @@ void Game::cmdMove(const std::vector<std::string>& args) {
         return;
     }
 
+    // If user passed a number, map it to a door in the current listing.
     const auto& doors = area->getDoors();
+    auto doorDirections = area->getDoorDirections();
+    bool usedNumber = std::all_of(direction.begin(), direction.end(), ::isdigit);
+    if (usedNumber && !doorDirections.empty()) {
+        size_t idx = std::stoul(direction);
+        if (idx == 0 || idx > doorDirections.size()) {
+            std::cout << "No exit with that number.\n";
+            return;
+        }
+        direction = doorDirections[idx - 1];
+    }
+
     auto it = doors.find(direction);
     if (it == doors.end()) {
         std::cout << "There's no exit that way.\n";
@@ -228,6 +240,22 @@ void Game::cmdInteract(const std::vector<std::string>& args) {
     for (size_t i = 1; i < args.size(); ++i) {
         objectName += " ";
         objectName += args[i];
+    }
+
+    // If numeric, map to nth visible object.
+    bool usedNumber = std::all_of(objectName.begin(), objectName.end(), ::isdigit);
+    if (usedNumber) {
+        auto visibleObjects = area->getVisibleObjectNames();
+        if (visibleObjects.empty()) {
+            std::cout << "There is nothing to interact with here.\n";
+            return;
+        }
+        size_t idx = std::stoul(objectName);
+        if (idx == 0 || idx > visibleObjects.size()) {
+            std::cout << "No object with that number.\n";
+            return;
+        }
+        objectName = visibleObjects[idx - 1];
     }
 
     area->interact(objectName, player.getInventory(), &audio);

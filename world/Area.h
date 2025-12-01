@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <algorithm>
 #include "Door.h"
 #include "Item.h"
 #include "Inventory.h"
@@ -60,6 +61,10 @@ public:
 
     // called by hint system to decide what hint to show
     std::string getHintContextId() const { return "area:" + areaId; }
+
+    // ordered listings for QoL numbering
+    std::vector<std::string> getVisibleObjectNames() const;
+    std::vector<std::string> getDoorDirections() const;
 
 private:
     struct ObjectData {
