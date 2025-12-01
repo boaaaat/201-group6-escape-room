@@ -1,6 +1,7 @@
 #include "RoomLostSocks.h"
 #include <iostream>
 #include "../engine/Dialogue.h"
+#include "../world/InteractableObject.h"
 
 RoomLostSocks::RoomLostSocks(CraftingSystem& craftRef)
     : Room(
@@ -76,18 +77,23 @@ void RoomLostSocks::buildAreas() {
         "Mount Sockmore",
         Dialogue("A hill of tangled socks with a variety of different colors.")
     );
-    sockMountain.addObject(
-        "sockpile",
+
+    InteractableObject sockPile(Dialogue("You've already disturbed this part of the pile."));
+    InteractableObject::Interaction digPile;
+    digPile.id = "sockpile_dig";
+    digPile.dialogue = Dialogue(
         "You dig into the sockpile.\n"
-        "As you dig into the sockpile, a sock wriggles into your hand, whispering: \"I miss Righty...\"",
-        Item(
-            "Sock of Truth (L)",
-            "A left sock with a very interesting color palette...",
-            true,
-            "Is it just me or did this sock just whisper me something about missing a Righty?"
-        ),
-        /*singleUse=*/true
+        "As you dig into the sockpile, a sock wriggles into your hand, whispering: \"I miss Righty...\""
     );
+    digPile.reward = Item(
+        "Sock of Truth (L)",
+        "A left sock with a very interesting color palette...",
+        true,
+        "Is it just me or did this sock just whisper me something about missing a Righty?"
+    );
+    digPile.singleUse = true;
+    sockPile.addInteraction(digPile);
+    sockMountain.addObject("sockpile", sockPile);
     sockMountain.addDoor(
         "east",
         Door(
@@ -106,18 +112,34 @@ void RoomLostSocks::buildAreas() {
         Dialogue("An ancient office desk covered in dust and snack crumbs. A sticky note reads:\n"
         "\"KCSO -> SOCK. Remember this.\"")
     );
-    fuzzyDesk.addObject(
-        "desk",
-        "You rummage through the fuzzy drawers.\n"
-        "You find: Sock of Truth (R). Maybe there is a left one...",
-        Item(
-            "Sock of Truth (R)",
-            "A right sock with a interesting color palette.",
-            true,
-            "If reunited with Lefty, something powerful might happen."
-        ),
-        /*singleUse=*/true
+
+    InteractableObject desk(Dialogue("You already emptied the drawers here."));
+    InteractableObject::Interaction clearDesk;
+    clearDesk.id = "desk_clear";
+    clearDesk.dialogue = Dialogue(
+        "You brush aside the crumbs and sticky notes. A drawer handle loosens-maybe rummage again."
     );
+    clearDesk.singleUse = true;
+    clearDesk.unlocksOnUse = { "desk_rummage" };
+    desk.addInteraction(clearDesk);
+
+    InteractableObject::Interaction rummageDesk;
+    rummageDesk.id = "desk_rummage";
+    rummageDesk.dialogue = Dialogue(
+        "You rummage through the fuzzy drawers.\n"
+        "You find: Sock of Truth (R). Maybe there is a left one..."
+    );
+    rummageDesk.reward = Item(
+        "Sock of Truth (R)",
+        "A right sock with a interesting color palette.",
+        true,
+        "If reunited with Lefty, something powerful might happen."
+    );
+    rummageDesk.singleUse = true;
+    rummageDesk.startsLocked = true;
+    desk.addInteraction(rummageDesk);
+
+    fuzzyDesk.addObject("desk", desk);
 
     fuzzyDesk.addDoor(
         "west",
@@ -147,15 +169,31 @@ void RoomLostSocks::buildAreas() {
         Dialogue("A dryer shaped like a tiny black hole. A glowing laundry basket floats in front of\n"
         "a shimmering EXIT PORTAL. The basket stares at you menancingly.")
     );
-    
-    dryerPortal.addObject(
-        "basket",
+
+    InteractableObject basket(Dialogue("The basket hovers quietly, waiting for you to prove yourself."));
+    basket.markBroken(
+        Dialogue(
+            "The basket vibrates impatiently. It refuses to listen until it sees perfectly matched socks."
+        ),
+        { { "Matched Pair", 1 } },
+        Dialogue(
+            "The basket glows, satisfied by your matching prowess. It's willing to hear you out now."
+        ),
+        /*consumeItemsOnRepair=*/false
+    );
+
+    InteractableObject::Interaction basketChallenge;
+    basketChallenge.id = "basket_challenge";
+    basketChallenge.dialogue = Dialogue(
         "The basket booms:\n"
         "\"ONLY MATCHES MAY PASS. SPELL YOUR WORTH.\"\n"
-        "Yeah, it's dramatic.",
-        Item("", "", false, ""),
-        /*singleUse=*/false
+        "Yeah, it's dramatic."
     );
+    basketChallenge.singleUse = false;
+    basketChallenge.requiresFixed = true;
+    basket.addInteraction(basketChallenge);
+
+    dryerPortal.addObject("basket", basket);
 
     dryerPortal.addDoor(
         "north",

@@ -58,9 +58,8 @@ void Game::run() {
     std::cout << " hint (h)" << std::endl;
     std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
-    std::cout << " solve (solve the puzzle) (s)" << std::endl << std::endl;
-    std::cout << "[You awaken in the Interdimensional Lost & Found...]\n";
-    std::cout << "CLERK: \"Four rooms. Four proofs. Reclaim yourself.\"\n";
+    std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
+    std::cout << " help (see the command list)\n";
 
     while (true) {
         std::cout << "\n> ";
@@ -122,19 +121,19 @@ void Game::run() {
         } 
         else if (cmd == "help") {
             std::cout << "=== Commands: ===" << std::endl;
-    std::cout << " move <direction|number> (m)" << std::endl;
-    std::cout << " observe (obs)" << std::endl;
-    std::cout << " interact <object|number> (int)" << std::endl;
+            std::cout << " move <direction|number> (m)" << std::endl;
+            std::cout << " observe (obs)" << std::endl;
+            std::cout << " interact <object|number> (int)" << std::endl;
             std::cout << " craft <object name> (c)" << std::endl;
             std::cout << " uncraft (u)" << std::endl;
             std::cout << " recipes (r)" << std::endl;
             std::cout << " hint (h)" << std::endl;
             std::cout << " info <object> (i)" << std::endl;
             std::cout << " inv (see inventory)" << std::endl;
-            std::cout << " audio <mp3 path> (play sound effect or dialogue)" << std::endl;
-            std::cout << " solve (solve the puzzle) (s)" << std::endl << std::endl;
+            std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
         }
-        else {
+        else 
+        {
             std::cout << "Unknown command. Try:\n";
             std::cout << "  move / observe / interact / craft / uncraft / recipes / hint / info / inv / audio / solve / help / quit\n";
         }
@@ -272,6 +271,17 @@ void Game::cmdCraft(const std::vector<std::string>& args) {
     for (size_t i = 1; i < args.size(); ++i) {
         itemName += " ";
         itemName += args[i];
+    }
+
+    bool usedNumber = std::all_of(itemName.begin(), itemName.end(), ::isdigit);
+    if (usedNumber) {
+        size_t idx = std::stoul(itemName);
+        if (idx == 0) {
+            std::cout << "No recipe with that number.\n";
+            return;
+        }
+        crafting.craft(player.getInventory(), idx - 1);
+        return;
     }
 
     crafting.craft(player.getInventory(), toLower(itemName));

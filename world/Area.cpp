@@ -49,21 +49,13 @@ void Area::interact(const std::string& objectName,
         return;
     }
 
-    ObjectData& data = it->second;
-    data.dialogue.deliver(audioEngine);
-
-    if (!data.alreadyUsed) {
-        // give reward item
-        if (data.reward.getName() != "") {
-            std::cout << "You obtain: " << data.reward.getName() << "\n";
-            inv.addItem(data.reward);
-        }
-        if (data.singleUse) {
-            data.alreadyUsed = true;
-        }
-    } else {
-        std::cout << "You've already searched that.\n";
+    InteractableObject& object = it->second;
+    if (!object.isInteractable()) {
+        std::cout << "It doesn't seem interactive right now.\n";
+        return;
     }
+
+    object.interact(inv, audioEngine);
 }
 
 void Area::addDoor(const std::string& direction, const Door& d) {
@@ -74,6 +66,10 @@ Door* Area::getDoor(const std::string& direction) {
     auto it = doors.find(direction);
     if (it == doors.end()) return nullptr;
     return &(it->second);
+}
+
+void Area::addObject(const std::string& objectName, const InteractableObject& object) {
+    objects[objectName] = object;
 }
 
 void Area::addObject(const std::string& objectName,
@@ -87,26 +83,34 @@ void Area::addObject(const std::string& objectName,
                      const Dialogue& dialogue,
                      const Item& rewardItem,
                      bool singleUse) {
-    ObjectData data;
-    data.dialogue = dialogue;
-    data.reward = rewardItem;
-    data.singleUse = singleUse;
-    data.alreadyUsed = false;
-    objects[objectName] = data;
+    InteractableObject object(Dialogue("You've already searched that."));
+    InteractableObject::Interaction interaction;
+    interaction.id = objectName + "_default";
+    interaction.dialogue = dialogue;
+    if (!rewardItem.getName().empty()) {
+        interaction.reward = rewardItem;
+    }
+    interaction.singleUse = singleUse;
+    interaction.requiresFixed = false;
+    interaction.requiresBroken = false;
+    interaction.startsLocked = false;
+    object.addInteraction(interaction);
+
+    addObject(objectName, object);
 }
 
 void Area::setObjectDialogue(const std::string& objectName, const Dialogue& dlg) {
     auto it = objects.find(objectName);
     if (it == objects.end()) return;
-    it->second.dialogue = dlg;
+    it->second.setInteractionDialogue(objectName + "_default", dlg);
 }
 
 std::vector<std::string> Area::getVisibleObjectNames() const {
     std::vector<std::string> names;
     for (const auto& kv : objects) {
         const auto& objName = kv.first;
-        const auto& data = kv.second;
-        if (!data.alreadyUsed) {
+        const auto& object = kv.second;
+        if (object.isInteractable()) {
             names.push_back(objName);
         }
     }

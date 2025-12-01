@@ -6,6 +6,7 @@
 #include "Door.h"
 #include "Item.h"
 #include "Inventory.h"
+#include "InteractableObject.h"
 #include "HintSystem.h"
 #include "../engine/Dialogue.h"
 
@@ -45,8 +46,9 @@ public:
     // get a mutable ref to a door (to unlock after puzzle)
     Door* getDoor(const std::string& direction);
 
-    // Add an interactable "object" in this area, like "sockpile", "desk"
-    // The value is a bool to indicate if it's been looted/used already.
+    // Add an interactable object in this area.
+    void addObject(const std::string& objectName, const InteractableObject& object);
+    // Convenience helpers for a simple single-interaction object
     void addObject(const std::string& objectName,
                    const std::string& objectDesc,
                    const Item& rewardItem,
@@ -67,16 +69,9 @@ public:
     std::vector<std::string> getDoorDirections() const;
 
 private:
-    struct ObjectData {
-        Dialogue dialogue;
-        Item reward;
-        bool singleUse = false;
-        bool alreadyUsed = false;
-    };
-
     std::string areaId;        // internal key e.g. "sock_mountain"
     std::string displayName;   // "Mount Sockmore"
     Dialogue description;      // long description for observe()
-    std::map<std::string, ObjectData> objects;
+    std::map<std::string, InteractableObject> objects;
     std::map<std::string, Door> doors;
 };

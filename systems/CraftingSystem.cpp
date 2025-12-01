@@ -54,6 +54,15 @@ bool CraftingSystem::craft(Inventory& inv, const std::string& resultName) {
     return true;
 }
 
+bool CraftingSystem::craft(Inventory& inv, size_t recipeIndex) {
+    if (recipeIndex >= recipes.size()) {
+        std::cout << "No recipe with that number.\n";
+        return false;
+    }
+    const auto& recipe = recipes[recipeIndex];
+    return craft(inv, toLower(recipe.resultName));
+}
+
 bool CraftingSystem::uncraft(Inventory& inv) {
     if (!hasLastCraft) {
         std::cout << "There's nothing recent to uncraft.\n";
@@ -92,8 +101,9 @@ void CraftingSystem::listRecipes() const {
     }
 
     std::cout << "=== Known Crafting Recipes ===\n";
-    for (const auto& r : recipes) {
-        std::cout << r.resultName << " = ";
+    for (size_t idx = 0; idx < recipes.size(); ++idx) {
+        const auto& r = recipes[idx];
+        std::cout << (idx + 1) << ". " << r.resultName << " = ";
         for (size_t i = 0; i < r.ingredients.size(); ++i) {
             std::cout << r.ingredients[i];
             if (i + 1 < r.ingredients.size()) std::cout << " + ";

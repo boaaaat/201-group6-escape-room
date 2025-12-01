@@ -25,6 +25,7 @@
                 "world/WorldMap.cpp",
                 "world/Room.cpp",
                 "world/Area.cpp",
+                "world/InteractableObject.cpp",
 
                 "systems/Inventory.cpp",
                 "systems/CraftingSystem.cpp",
