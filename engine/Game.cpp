@@ -43,7 +43,7 @@ Game::Game() {
         "observe",
         Dialogue(
             "You feel like the socks are watching you... maybe there's something buried here.",
-            "speech\\RoomLostSocks\\room_intro.mp3"  // attach an MP3 path here to auto-play TTS
+            "audio\\RoomLostSocks\\room_intro.mp3"  // attach an MP3 path here to auto-play TTS
         ),
         /*fireOnce=*/true
     );

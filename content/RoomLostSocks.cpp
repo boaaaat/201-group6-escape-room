@@ -8,7 +8,7 @@ RoomLostSocks::RoomLostSocks(CraftingSystem& craftRef)
         "lost_socks",
         "Lobby of Lost Socks",
         Dialogue("You step into a warm, sock-scented dimension. Piles of single socks float and whisper.\n"
-        "A glowing laundry basket blocks what looks like an exit portal.", "speech\\RoomLostSocks\\room_intro.mp3")
+        "A glowing laundry basket blocks what looks like an exit portal.", "audio\\RoomLostSocks\\room_intro.mp3")
       ),
       gatePuzzle({
           {"KCSO",  "SOCK"},
