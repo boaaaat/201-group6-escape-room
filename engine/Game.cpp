@@ -87,14 +87,9 @@ void Game::run() {
     std::cout << " move <direction> (m)" << std::endl;
     std::cout << " observe (obs)" << std::endl;
     std::cout << " interact <object|number> (int)" << std::endl;
-    std::cout << " craft <object name> (c)" << std::endl;
-    std::cout << " uncraft (u)" << std::endl;
-    std::cout << " recipes (r)" << std::endl;
-    std::cout << " hint (h)" << std::endl;
     std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
     std::cout << " teleport (tp)" << std::endl;
-    std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
     std::cout << " help (see the command list)\n";
 
     while (true) {
