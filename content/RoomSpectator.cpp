@@ -255,8 +255,7 @@ void RoomSpectator::buildAreas() {
         "socky_field",
         "Socky Field",
         Dialogue(
-            "I SEE THAT YOU HAVE AWOKEN EXPERIMENT #99, TOOK YOU LONG ENOUGH!, anyways. I will be recording your every movement so don't mind me. If anything just think of me as your partner, though don't expect any help from me, unless you ask nicely then maybe.\n"
-            "-You unlocked hint\n"
+            "I SEE THAT YOU HAVE AWOKEN EXPERIMENT #99, TOOK YOU LONG ENOUGH!, anyways. I will be recording your every movement so don't mind me. If anything just think of me as your partner, though don't expect any help from me.\n"
             "As you observe your surroundings, you notice the grass around you are actually socks with a bunch of soccer balls scattered all around. After getting distracted you notice...\n"
         )
     );

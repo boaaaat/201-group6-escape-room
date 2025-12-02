@@ -71,7 +71,6 @@ void Game::run() {
     std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
     std::cout << " teleport (tp)" << std::endl;
-    std::cout << " solve (solve the final puzzle) (s)" << std::endl << std::endl;
     std::cout << " help (see the command list)\n";
 
     while (true) {
