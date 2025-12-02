@@ -34,18 +34,6 @@ Game::Game() {
 
     // Register some basic hints for areas
     hints.registerHint(
-        "area:sock_mountain",
-        "Try 'interact sockpile'. Something might be buried in the fluff."
-    );
-    hints.registerHint(
-        "area:fuzzy_desk",
-        "Maybe 'interact desk'. The sticky note looks suspicious."
-    );
-    hints.registerHint(
-        "area:dryer_portal",
-        "If you're stuck, craft \"Matched Pair\" and then try 'solve'."
-    );
-    hints.registerHint(
         "area:awakening_cell",
         "Try interacting with the sockpile more than once; something useful might be buried there."
     );
@@ -69,17 +57,6 @@ Game::Game() {
         "area:observatory",
         "Point the telescope upward, then give it a 180 spin."
     );
-
-    // Example inner-monologue event when the player observes the sock mountain.
-    events.registerCommandEvent(
-        "sock_mountain",
-        "observe",
-        Dialogue(
-            "You feel like the socks are watching you... maybe there's something buried here.",
-            "audio\\RoomLostSocks\\room_intro.mp3"  // attach an MP3 path here to auto-play TTS
-        ),
-        /*fireOnce=*/true
-    );
 }
 
 void Game::run() {
@@ -87,10 +64,10 @@ void Game::run() {
     std::cout << " move <direction> (m)" << std::endl;
     std::cout << " observe (obs)" << std::endl;
     std::cout << " interact <object|number> (int)" << std::endl;
-    std::cout << " craft <object name> (c)" << std::endl;
-    std::cout << " uncraft (u)" << std::endl;
-    std::cout << " recipes (r)" << std::endl;
-    std::cout << " hint (h)" << std::endl;
+    // std::cout << " craft <object name> (c)" << std::endl;
+    // std::cout << " uncraft (u)" << std::endl;
+    // std::cout << " recipes (r)" << std::endl;
+    // std::cout << " hint (h)" << std::endl;
     std::cout << " info <object> (i)" << std::endl;
     std::cout << " inv (see inventory)" << std::endl;
     std::cout << " teleport (tp)" << std::endl;
@@ -163,10 +140,10 @@ void Game::run() {
             std::cout << " move <direction|number> (m)" << std::endl;
             std::cout << " observe (obs)" << std::endl;
             std::cout << " interact <object|number> (int)" << std::endl;
-            std::cout << " craft <object name> (c)" << std::endl;
-            std::cout << " uncraft (u)" << std::endl;
-            std::cout << " recipes (r)" << std::endl;
-            std::cout << " hint (h)" << std::endl;
+            // std::cout << " craft <object name> (c)" << std::endl;
+            // std::cout << " uncraft (u)" << std::endl;
+            // std::cout << " recipes (r)" << std::endl;
+            // std::cout << " hint (h)" << std::endl;
             std::cout << " info <object> (i)" << std::endl;
             std::cout << " inv (see inventory)" << std::endl;
             std::cout << " teleport (tp)" << std::endl;
@@ -175,7 +152,7 @@ void Game::run() {
         else 
         {
             std::cout << "Unknown command. Try:\n";
-            std::cout << "  move / observe / interact / craft / uncraft / recipes / hint / info / inv / audio / solve / help / quit\n";
+            std::cout << "  move / observe / interact / hint / info / inv / audio / solve / help / quit\n";
         }
 
         events.handleCommand(commandAreaContext, cmd, &audio);
@@ -370,6 +347,22 @@ void Game::cmdInfo(const std::vector<std::string>& args) {
     for (size_t i = 1; i < args.size(); ++i) {
         itemName += " ";
         itemName += args[i];
+    }
+
+    // allow numeric selection from inventory list
+    bool usedNumber = std::all_of(itemName.begin(), itemName.end(), ::isdigit);
+    if (usedNumber) {
+        size_t idx = std::stoul(itemName);
+        if (idx == 0) {
+            std::cout << "No item with that number.\n";
+            return;
+        }
+        const auto& items = player.getInventory().getItems();
+        if (idx > items.size()) {
+            std::cout << "No item with that number.\n";
+            return;
+        }
+        itemName = items[idx - 1].getName();
     }
 
     player.getInventory().describeItem(itemName);

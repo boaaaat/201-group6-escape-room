@@ -28,8 +28,8 @@ std::string RoomMemories::getStartAreaId() const {
     return "projector_room";
 }
 
-bool RoomMemories::attemptFinalPuzzle(Inventory& /*inv*/,
-                                      CraftingSystem& /*crafting*/) {
+bool RoomMemories::attemptFinalPuzzle(Inventory& ,
+                                      CraftingSystem& ) {
     return solved;
 }
 
@@ -177,7 +177,7 @@ void RoomMemories::buildAreas() {
     projectorDoorCheck.id = "projector_door_check";
     projectorDoorCheck.dialogue = Dialogue("");
     projectorDoorCheck.singleUse = false;
-    projectorDoorCheck.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    projectorDoorCheck.onUse = [this](Inventory& , AudioEngine*) {
         if (!projectorComplete) {
             std::cout << "As you get near the door you attempt to open it, surprisingly enough it's locked. Who would have thought.\n";
         } else {
@@ -265,7 +265,7 @@ void RoomMemories::buildAreas() {
     mazeNavigate.id = "maze_navigate";
     mazeNavigate.dialogue = Dialogue("");
     mazeNavigate.singleUse = false;
-    mazeNavigate.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    mazeNavigate.onUse = [this](Inventory& , AudioEngine*) {
         if (mazeSolved) {
             std::cout << "You remember the maze clearly. The path to the north stays open.\n";
             return;

@@ -32,8 +32,8 @@ std::string RoomAlternativeRoutes::getStartAreaId() const {
     return "entrance";
 }
 
-bool RoomAlternativeRoutes::attemptFinalPuzzle(Inventory& /*inv*/,
-                                               CraftingSystem& /*crafting*/) {
+bool RoomAlternativeRoutes::attemptFinalPuzzle(Inventory& ,
+                                               CraftingSystem& ) {
     if (adminExitUnlocked) {
         solved = true;
         return true;
@@ -188,7 +188,7 @@ void RoomAlternativeRoutes::buildAreas() {
     adminDoorInteract.id = "admin_door";
     adminDoorInteract.dialogue = Dialogue("");
     adminDoorInteract.singleUse = false;
-    adminDoorInteract.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    adminDoorInteract.onUse = [this](Inventory& , AudioEngine*) {
         Area* a = getArea("entrance");
         if (!a) return;
         Door* d = a->getDoor("admin");
@@ -471,7 +471,7 @@ void RoomAlternativeRoutes::buildAreas() {
     lampTouch.id = "lamp_touch";
     lampTouch.dialogue = Dialogue("");
     lampTouch.singleUse = false;
-    lampTouch.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    lampTouch.onUse = [this](Inventory& , AudioEngine*) {
         markHallVisited();
         if (!cocoaPlaced) {
             std::cout << "It flickers intensely as if judging your incompetence.\n";
@@ -528,7 +528,7 @@ void RoomAlternativeRoutes::buildAreas() {
     logRead.id = "log_read";
     logRead.dialogue = Dialogue("");
     logRead.singleUse = false;
-    logRead.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    logRead.onUse = [this](Inventory& , AudioEngine*) {
         if (!adminLogRead) {
             adminLogRead = true;
             std::cout << "You read:\n";

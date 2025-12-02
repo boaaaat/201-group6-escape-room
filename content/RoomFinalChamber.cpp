@@ -33,8 +33,8 @@ std::string RoomFinalChamber::getStartAreaId() const {
     return "central";
 }
 
-bool RoomFinalChamber::attemptFinalPuzzle(Inventory& /*inv*/,
-                                          CraftingSystem& /*crafting*/) {
+bool RoomFinalChamber::attemptFinalPuzzle(Inventory& ,
+                                          CraftingSystem& ) {
     return solved;
 }
 
@@ -246,7 +246,7 @@ void RoomFinalChamber::buildAreas() {
     finalDoorUse.id = "final_door";
     finalDoorUse.dialogue = Dialogue("");
     finalDoorUse.singleUse = false;
-    finalDoorUse.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    finalDoorUse.onUse = [this](Inventory& , AudioEngine*) {
         if (!finalDoorAppeared) {
             std::cout << "An empty circular platform hums faintly. Perhaps you must satisfy all statues first.\n";
             return;

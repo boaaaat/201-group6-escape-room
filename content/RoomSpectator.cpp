@@ -24,8 +24,8 @@ std::string RoomSpectator::getStartAreaId() const {
     return "awakening_cell";
 }
 
-bool RoomSpectator::attemptFinalPuzzle(Inventory& /*inv*/,
-                                       CraftingSystem& /*crafting*/) {
+bool RoomSpectator::attemptFinalPuzzle(Inventory& ,
+                                       CraftingSystem& ) {
     // This room doesn't gate the overall progression; keep moving forward.
     return solved;
 }
@@ -318,7 +318,7 @@ void RoomSpectator::buildAreas() {
     soccerBallKick.id = "soccer_ball";
     soccerBallKick.dialogue = Dialogue("");
     soccerBallKick.singleUse = false;
-    soccerBallKick.onUse = [this](Inventory& /*inv*/, AudioEngine*) {
+    soccerBallKick.onUse = [this](Inventory& , AudioEngine*) {
         if (!sockPlaced) {
             std::cout << "HEY DON'T YOU DARE GET NEAR THAT SOCCER BALL!\n";
             return;
