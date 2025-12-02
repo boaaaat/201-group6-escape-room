@@ -68,6 +68,9 @@ public:
     std::vector<std::string> getVisibleObjectNames() const;
     std::vector<std::string> getDoorDirections() const;
 
+    // Mutable access to an object by name (nullptr if not found)
+    InteractableObject* getObject(const std::string& name);
+
 private:
     std::string areaId;        // internal key e.g. "sock_mountain"
     std::string displayName;   // "Mount Sockmore"

@@ -34,6 +34,10 @@
                 "puzzles/ScramblePuzzle.cpp",
 
                 "content/RoomLostSocks.cpp",
+                "content/RoomSpectator.cpp",
+                "content/RoomMemories.cpp",
+                "content/RoomAlternativeRoutes.cpp",
+                "content/RoomFinalChamber.cpp",
 
                 "-static",
                 "-static-libgcc",

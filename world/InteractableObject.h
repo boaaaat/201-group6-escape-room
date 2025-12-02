@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <functional>
 #include "../engine/Dialogue.h"
 #include "../systems/Inventory.h"
 
@@ -26,6 +27,7 @@ public:
         bool startsLocked = false;          // needs unlockInteraction() or unlocksOnUse to enable
         std::optional<Dialogue> lockedDialogue; // optional message when interaction is still locked
         std::vector<std::string> unlocksOnUse;  // ids to unlock after this runs
+        std::function<void(Inventory&, AudioEngine*)> onUse; // optional callback for custom effects
     };
 
     InteractableObject(const Dialogue& exhaustedDialogue = Dialogue("You've already done that here."),

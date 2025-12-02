@@ -140,6 +140,10 @@ void InteractableObject::runInteraction(InteractionState& interaction,
         inventory.addItem(reward);
     }
 
+    if (interaction.data.onUse) {
+        interaction.data.onUse(inventory, audioEngine);
+    }
+
     if (interaction.data.singleUse) {
         interaction.used = true;
     }

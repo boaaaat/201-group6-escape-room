@@ -1,6 +1,11 @@
 #include "Game.h"
 #include "CommandParser.h"
 #include "../content/RoomLostSocks.h"
+#include "../content/RoomSpectator.h"
+#include "../content/RoomMemories.h"
+#include "../content/RoomAlternativeRoutes.h"
+#include "../content/RoomFinalChamber.h"
+#include "../systems/Item.h"
 #include "../world/Room.h"
 #include <iostream>
 #include <algorithm>
@@ -12,10 +17,14 @@
 Game::Game() {
     // Register rooms.
     // Lost Socks room needs CraftingSystem reference so it can inject recipes.
-    world.registerRoom(std::make_unique<RoomLostSocks>(crafting));
+    world.registerRoom(std::make_unique<RoomFinalChamber>());
+    world.registerRoom(std::make_unique<RoomAlternativeRoutes>());
+    world.registerRoom(std::make_unique<RoomMemories>());
+    world.registerRoom(std::make_unique<RoomSpectator>());
+    // world.registerRoom(std::make_unique<RoomLostSocks>(crafting));
 
     // Starting location
-    player.currentRoomId = "lost_socks";
+    player.currentRoomId = "spectator";
     Room* startRoom = world.getRoom(player.currentRoomId);
     if (startRoom) {
         player.currentAreaId = startRoom->getStartAreaId();
@@ -35,6 +44,30 @@ Game::Game() {
     hints.registerHint(
         "area:dryer_portal",
         "If you're stuck, craft \"Matched Pair\" and then try 'solve'."
+    );
+    hints.registerHint(
+        "area:awakening_cell",
+        "Try interacting with the sockpile more than once; something useful might be buried there."
+    );
+    hints.registerHint(
+        "area:socky_field",
+        "The Sockpost is missing a specific sock. Check the sock pile again after examining it."
+    );
+    hints.registerHint(
+        "area:cocoaville",
+        "Grab the Cup of Cocoa and see what happens if you approach the fireplace with it."
+    );
+    hints.registerHint(
+        "area:projector_room",
+        "Interact with the stand to learn what's missing, then re-check old areas for parts."
+    );
+    hints.registerHint(
+        "area:forgotten_maze",
+        "Think: Right path, then Left, then 4th door, then Truth."
+    );
+    hints.registerHint(
+        "area:observatory",
+        "Point the telescope upward, then give it a 180 spin."
     );
 
     // Example inner-monologue event when the player observes the sock mountain.
@@ -214,6 +247,19 @@ void Game::cmdMove(const std::vector<std::string>& args) {
     if (newRoom && newRoom != room) {
         // entering a new major room => intro
         newRoom->enterRoomIntro(&audio);
+    }
+
+    Area* newArea = getCurrentArea();
+    if (newArea && newArea != area) {
+        if (player.currentAreaId == "socky_field" &&
+            !player.getInventory().hasItem("Token:ProjectorQuestStarted")) {
+            player.getInventory().addItem(Item(
+                "Token:ProjectorQuestStarted",
+                "Quest flag: Projector parts are now findable.",
+                false,
+                ""
+            ));
+        }
     }
 
     // auto observe new area

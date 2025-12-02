@@ -124,3 +124,9 @@ std::vector<std::string> Area::getDoorDirections() const {
     }
     return dirs;
 }
+
+InteractableObject* Area::getObject(const std::string& name) {
+    auto it = objects.find(name);
+    if (it == objects.end()) return nullptr;
+    return &(it->second);
+}
