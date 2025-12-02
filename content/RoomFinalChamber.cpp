@@ -122,7 +122,7 @@ void RoomFinalChamber::buildAreas() {
         if (!inv.hasItem("Symbol of Memory")) {
             std::cout << "The statue's eyes shimmer like a dim projection.\n";
             std::cout << "\"I show you who you were,\nIn flickering light and silent sky.\nI needed three pieces to awaken,\nAnd pointed you toward yourself on high.\nReturn with the mark of what you remembered.\"\n";
-            std::cout << "SPECTATOR: \"Oh, this one is dramatic. It's talking about when you actually did something right with that projector, remember?\"\n";
+            std::cout << "SPECTATOR: \"Oh, this one is dramatic. It's talking about when you actually did something right with that telescope, remember?\"\n";
             if (!inv.hasItem(kTokenRiddleMemory)) {
                 inv.addItem(Item(
                     kTokenRiddleMemory,
